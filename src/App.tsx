@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button } from './components/Button';
 import { MovieCard } from './components/MovieCard';
@@ -46,19 +46,26 @@ export function App() {
     });
   }, []);
 
-  useEffect(() => {
+  const getMoviesList = useCallback(() => {
     api.get<MovieProps[]>(`movies/?Genre_id=${selectedGenreId}`).then(response => {
       setMovies(response.data);
     });
+  }, [selectedGenreId])
 
+  const getGenreSelected = useCallback(() => {
     api.get<GenreResponseProps>(`genres/${selectedGenreId}`).then(response => {
       setSelectedGenre(response.data);
     })
+  }, [selectedGenreId])
+
+  useEffect(() => {
+    getMoviesList();
+    getGenreSelected();
   }, [selectedGenreId]);
 
-  function handleClickButton(id: number) {
+  const handleClickButton = useCallback((id: number) => {
     setSelectedGenreId(id);
-  }
+  }, [setSelectedGenreId])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
